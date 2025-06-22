@@ -83,8 +83,8 @@ export default function CheckoutPage() {
           planId: selectedPlan.planId,
           billingCycle,
           // Передаем URL с параметром session_id для Stripe
-          successUrl: 'https://prospecttrade.org/payment-success?session_id={CHECKOUT_SESSION_ID}',
-          cancelUrl: 'https://prospecttrade.org/payment-cancelled',
+          successUrl: 'https://carisaa.vercel.app/payment-success?session_id={CHECKOUT_SESSION_ID}',
+          cancelUrl: 'https://carisaa.vercel.app/payment-cancelled',
         },
         accessToken
       );
