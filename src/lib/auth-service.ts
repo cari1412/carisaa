@@ -237,7 +237,7 @@ class AuthService {
     return this.user;
   }
 
-  private clearTokens(): void {
+  clearTokens(): void {
     this.accessToken = null;
     this.refreshToken = null;
     this.user = null;
@@ -253,8 +253,84 @@ class AuthService {
     return this.accessToken;
   }
 
+  getRefreshToken(): string | null {
+    return this.refreshToken;
+  }
+
   isAuthenticated(): boolean {
     return !!this.accessToken;
+  }
+
+  // Проверка валидности токена
+  isTokenValid(): boolean {
+    const token = this.accessToken;
+    if (!token) return false;
+    
+    try {
+      // Декодируем JWT токен
+      const parts = token.split('.');
+      if (parts.length !== 3) return false;
+      
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp * 1000; // конвертируем в миллисекунды
+      
+      // Проверяем не истек ли токен
+      const isValid = Date.now() < exp;
+      console.log('Token validation:', {
+        exp: new Date(exp),
+        now: new Date(),
+        isValid
+      });
+      
+      return isValid;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return false;
+    }
+  }
+
+  // Дебаг метод для проверки состояния
+  debugAuthState(): void {
+    console.log('=== Auth State Debug ===');
+    console.log('Access Token:', this.accessToken ? `${this.accessToken.substring(0, 20)}...` : 'null');
+    console.log('Refresh Token:', this.refreshToken ? 'exists' : 'null');
+    console.log('User:', this.user);
+    console.log('Is Authenticated:', this.isAuthenticated());
+    console.log('Is Token Valid:', this.isTokenValid());
+    if (typeof window !== 'undefined') {
+      console.log('LocalStorage tokens:', {
+        access: localStorage.getItem('accessToken') ? 'exists' : 'null',
+        refresh: localStorage.getItem('refreshToken') ? 'exists' : 'null'
+      });
+    }
+    console.log('======================');
+  }
+
+  // Восстановление состояния авторизации из localStorage
+  async restoreAuthState(): Promise<User | null> {
+    try {
+      if (!this.isAuthenticated()) {
+        return null;
+      }
+
+      // Проверяем валидность токена
+      if (!this.isTokenValid()) {
+        // Пробуем обновить токен
+        await this.refreshAccessToken();
+      }
+
+      // Если пользователь уже загружен, возвращаем его
+      if (this.user) {
+        return this.user;
+      }
+
+      // Иначе загружаем данные пользователя
+      return await this.getMe();
+    } catch (error) {
+      console.error('Failed to restore auth state:', error);
+      this.clearTokens();
+      return null;
+    }
   }
 }
 

@@ -22,50 +22,109 @@ interface Subscription {
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, checkAuth } = useAuth();
+  const { user, checkAuth, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  // const sessionId = searchParams.get('session_id'); // Убираем неиспользуемую переменную
+  const [authChecked, setAuthChecked] = useState(false);
+  
+  // Отладочная информация
+  useEffect(() => {
+    console.log('=== Payment Success Debug ===');
+    console.log('Session ID:', searchParams.get('session_id'));
+    console.log('Pending payment data:', sessionStorage.getItem('pendingPayment'));
+    if (authService.debugAuthState) {
+      authService.debugAuthState();
+    }
+    console.log('===========================');
+  }, [searchParams]);
+
+  // Первым делом проверяем авторизацию
+  useEffect(() => {
+    const verifyAuth = async () => {
+      try {
+        console.log('Payment success - Starting auth verification...');
+        console.log('Current auth state:', { user, authLoading });
+        
+        // Проверяем есть ли токен в localStorage
+        const accessToken = authService.getAccessToken();
+        console.log('Access token exists:', !!accessToken);
+        
+        if (!accessToken) {
+          console.log('No access token found, redirecting to login');
+          router.push('/login');
+          return;
+        }
+
+        // Если пользователя нет в контексте, но есть токен - пробуем обновить
+        if (!user && !authLoading) {
+          console.log('User not in context, checking auth...');
+          await checkAuth();
+          // Даем время на обновление состояния
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        setAuthChecked(true);
+      } catch (error) {
+        console.error('Auth verification failed:', error);
+        router.push('/login');
+      }
+    };
+
+    verifyAuth();
+  }, []); // Запускаем только при монтировании
+
+  // Загружаем подписку только после проверки авторизации
+  useEffect(() => {
+    if (authChecked && user) {
+      loadSubscription();
+    }
+  }, [authChecked, user]);
 
   const loadSubscription = async () => {
     try {
       const accessToken = authService.getAccessToken();
       if (!accessToken) {
+        console.error('No access token for loading subscription');
         router.push('/login');
         return;
       }
 
-      // Обновляем данные пользователя
-      await checkAuth();
-
+      console.log('Loading subscription...');
+      
+      // Небольшая задержка для синхронизации данных после оплаты
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // Загружаем информацию о подписке
       const sub = await stripeService.getCurrentSubscription(accessToken);
+      console.log('Subscription loaded:', sub);
       setSubscription(sub);
     } catch (error) {
       console.error('Failed to load subscription:', error);
+      // Не редиректим сразу, возможно подписка еще обрабатывается
+      setTimeout(() => loadSubscription(), 2000);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    
-    loadSubscription();
-  }, [user, router]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (loading) {
+  // Показываем загрузку пока идут проверки
+  if (authLoading || !authChecked || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-2 text-sm text-gray-600">Loading your subscription...</p>
+          <p className="mt-2 text-sm text-gray-600">
+            {!authChecked ? 'Verifying authentication...' : 'Loading your subscription...'}
+          </p>
         </div>
       </div>
     );
+  }
+
+  // Если после всех проверок пользователя нет - редирект
+  if (!user) {
+    router.push('/login');
+    return null;
   }
 
   return (
@@ -83,7 +142,7 @@ function PaymentSuccessContent() {
           </p>
         </div>
 
-        {subscription && (
+        {subscription ? (
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Subscription details
@@ -113,6 +172,12 @@ function PaymentSuccessContent() {
               )}
             </dl>
           </div>
+        ) : (
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              Your subscription is being processed. This may take a few moments...
+            </p>
+          </div>
         )}
 
         <div className="space-y-3">
@@ -123,24 +188,26 @@ function PaymentSuccessContent() {
             Go to Dashboard
           </button>
           
-          <button
-            onClick={async () => {
-              try {
-                const accessToken = authService.getAccessToken();
-                if (accessToken) {
-                  const portal = await stripeService.createCustomerPortal(accessToken);
-                  if (portal.url) {
-                    window.location.href = portal.url;
+          {subscription && (
+            <button
+              onClick={async () => {
+                try {
+                  const accessToken = authService.getAccessToken();
+                  if (accessToken) {
+                    const portal = await stripeService.createCustomerPortal(accessToken);
+                    if (portal.url) {
+                      window.location.href = portal.url;
+                    }
                   }
+                } catch (error) {
+                  console.error('Failed to open billing portal:', error);
                 }
-              } catch (error) {
-                console.error('Failed to open billing portal:', error);
-              }
-            }}
-            className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Manage subscription
-          </button>
+              }}
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Manage subscription
+            </button>
+          )}
         </div>
 
         <p className="text-xs text-gray-500 mt-4">

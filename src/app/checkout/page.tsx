@@ -68,6 +68,7 @@ export default function CheckoutPage() {
 
       const accessToken = authService.getAccessToken();
       if (!accessToken) {
+        console.error('No access token available');
         router.push('/login');
         return;
       }
@@ -75,24 +76,39 @@ export default function CheckoutPage() {
       console.log('Creating checkout session for:', {
         planId: plan.id,
         billingCycle,
+        origin: window.location.origin
       });
 
+      // Используем динамические URL на основе текущего домена
+      const baseUrl = window.location.origin;
+      
       // Создаем сессию оплаты Stripe
       const session = await stripeService.createCheckoutSession(
         {
           planId: selectedPlan.planId,
           billingCycle,
-          // Передаем URL с параметром session_id для Stripe
-          successUrl: 'https://carisaa.vercel.app/payment-success?session_id={CHECKOUT_SESSION_ID}',
-          cancelUrl: 'https://carisaa.vercel.app/payment-cancelled',
+          // Используем динамические URL
+          successUrl: `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${baseUrl}/payment-cancelled`,
         },
         accessToken
       );
 
       console.log('Checkout session created:', session);
 
+      // Сохраняем данные о платеже перед редиректом
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pendingPayment', JSON.stringify({
+          planId: selectedPlan.planId,
+          billingCycle,
+          timestamp: Date.now()
+        }));
+      }
+
       // Перенаправляем на Stripe Checkout
       if (session.url) {
+        // Очищаем выбранный план только после успешного создания сессии
+        clearSelectedPlan();
         window.location.href = session.url;
       } else {
         throw new Error('No checkout URL received');
