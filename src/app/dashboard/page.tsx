@@ -12,8 +12,7 @@ import {
   CheckCircle,
   AlertCircle,
   Calendar,
-  TrendingUp,
-  Zap
+  TrendingUp
 } from 'lucide-react';
 import { useAuth } from '@/app/providers/auth-provider';
 import { stripeService } from '@/lib/stripe-service';
@@ -24,7 +23,6 @@ export default function DashboardPage() {
   const { user, logout, loading: authLoading } = useAuth();
   const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -44,22 +42,14 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
-      setError(null);
       const accessToken = authService.getAccessToken();
-      if (!accessToken) {
-        console.error('No access token available');
-        setLoading(false);
-        return;
-      }
+      if (!accessToken) return;
 
       // Загружаем информацию о подписке
       const sub = await stripeService.getCurrentSubscription(accessToken);
-      console.log('Loaded subscription:', sub);
-      
       setSubscription(sub);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
-      setError('Failed to load subscription data');
     } finally {
       setLoading(false);
     }
@@ -68,10 +58,7 @@ export default function DashboardPage() {
   const handleManageSubscription = async () => {
     try {
       const accessToken = authService.getAccessToken();
-      if (!accessToken) {
-        console.error('No access token for portal');
-        return;
-      }
+      if (!accessToken) return;
 
       const portal = await stripeService.createCustomerPortal(accessToken);
       if (portal.url) {
@@ -79,24 +66,7 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Failed to open billing portal:', error);
-      setError('Failed to open billing portal');
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
   };
 
   if (authLoading || loading) {
@@ -106,10 +76,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  // Получаем план из подписки - проверяем оба варианта для совместимости
-  const plan = subscription?.planModel || subscription?.plan;
-  const hasActiveSubscription = subscription && subscription.status === 'ACTIVE' && plan;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,13 +101,6 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Error message */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* User Info Card */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -152,7 +111,7 @@ export default function DashboardPage() {
             <dl className="space-y-2">
               <div>
                 <dt className="text-sm text-gray-500">Name</dt>
-                <dd className="text-sm font-medium text-gray-900">{user?.name || 'Not set'}</dd>
+                <dd className="text-sm font-medium text-gray-900">{user?.name}</dd>
               </div>
               <div>
                 <dt className="text-sm text-gray-500">Email</dt>
@@ -183,65 +142,56 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900">Subscription</h2>
               <CreditCard className="h-5 w-5 text-gray-400" />
             </div>
-            {hasActiveSubscription ? (
+            {subscription ? (
               <>
                 <dl className="space-y-2">
                   <div>
                     <dt className="text-sm text-gray-500">Plan</dt>
-                    <dd className="text-sm font-medium text-gray-900 flex items-center">
-                      {plan.name}
-                      {plan.isPopular && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                          Popular
-                        </span>
-                      )}
+                    <dd className="text-sm font-medium text-gray-900">
+                      {subscription.plan?.name || 'Unknown Plan'}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm text-gray-500">Price</dt>
+                    <dt className="text-sm text-gray-500">Billing Cycle</dt>
                     <dd className="text-sm font-medium text-gray-900">
-                      {formatPrice(
-                        subscription.billingCycle === 'YEARLY' 
-                          ? plan.priceYearly / 12
-                          : plan.priceMonthly
-                      )}
-                      /month
-                      {subscription.billingCycle === 'YEARLY' && (
-                        <span className="text-xs text-gray-500 ml-1">(billed annually)</span>
-                      )}
+                      {subscription.billingCycle === 'yearly' ? 'Annual' : 'Monthly'}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-sm text-gray-500">Status</dt>
                     <dd className="flex items-center text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-600 capitalize">{subscription.status.toLowerCase()}</span>
+                      {subscription.status === 'active' ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                          <span className="text-green-600">Active</span>
+                        </>
+                      ) : (
+                        <span className="text-gray-600">{subscription.status}</span>
+                      )}
                     </dd>
                   </div>
-                  {(subscription.stripeCurrentPeriodEnd || subscription.currentPeriodEnd) && (
+                  {subscription.currentPeriodEnd && (
                     <div>
                       <dt className="text-sm text-gray-500">Next Billing</dt>
                       <dd className="text-sm font-medium text-gray-900">
-                        {formatDate(subscription.stripeCurrentPeriodEnd || subscription.currentPeriodEnd)}
+                        {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
                       </dd>
                     </div>
                   )}
                 </dl>
                 <button
                   onClick={handleManageSubscription}
-                  className="mt-4 w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
+                  className="mt-4 w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100"
                 >
                   Manage Subscription
                 </button>
               </>
             ) : (
               <div className="text-center py-4">
-                <p className="text-sm text-gray-500 mb-4">
-                  {subscription === null ? 'Loading...' : 'No active subscription'}
-                </p>
+                <p className="text-sm text-gray-500 mb-4">No active subscription</p>
                 <button
-                  onClick={() => router.push('/pricing')}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                  onClick={() => router.push('/#pricing')}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
                 >
                   View Plans
                 </button>
@@ -249,26 +199,26 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Plan Features Card */}
+          {/* Quick Stats Card */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Plan Features</h2>
-              <Zap className="h-5 w-5 text-gray-400" />
+              <h2 className="text-lg font-semibold text-gray-900">Quick Stats</h2>
+              <TrendingUp className="h-5 w-5 text-gray-400" />
             </div>
-            {hasActiveSubscription && plan?.features ? (
-              <ul className="space-y-2">
-                {plan.features.map((feature: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-sm text-gray-500">Subscribe to unlock features</p>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">Member Since</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {user && new Date(user.id).toLocaleDateString()}
+                </span>
               </div>
-            )}
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">Plan Features</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {subscription?.plan?.features?.length || 0} included
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -285,26 +235,15 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            {hasActiveSubscription && (
+            {subscription && (
               <div className="px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center">
                   <CreditCard className="h-5 w-5 text-gray-400 mr-3" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Subscription activated</p>
                     <p className="text-xs text-gray-500">
-                      {plan.name} plan - {subscription.billingCycle?.toLowerCase() || 'monthly'} billing
+                      {subscription.plan?.name} plan - {subscription.billingCycle} billing
                     </p>
-                  </div>
-                </div>
-              </div>
-            )}
-            {user?.emailVerified && (
-              <div className="px-6 py-4">
-                <div className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-gray-400 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Email verified</p>
-                    <p className="text-xs text-gray-500">Your account is fully activated</p>
                   </div>
                 </div>
               </div>
@@ -324,7 +263,7 @@ export default function DashboardPage() {
               <span className="text-sm font-medium text-gray-900">Account Settings</span>
             </button>
             
-            {hasActiveSubscription ? (
+            {subscription ? (
               <button
                 onClick={handleManageSubscription}
                 className="flex items-center justify-center px-4 py-3 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
@@ -334,7 +273,7 @@ export default function DashboardPage() {
               </button>
             ) : (
               <button
-                onClick={() => router.push('/pricing')}
+                onClick={() => router.push('/#pricing')}
                 className="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-600 rounded-lg shadow hover:shadow-md transition-shadow"
               >
                 <CreditCard className="h-5 w-5 mr-2" />
