@@ -21,24 +21,13 @@ export interface Subscription {
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   currentPeriodEnd?: string;
-  stripeCurrentPeriodEnd?: string;
   billingCycle: 'MONTHLY' | 'YEARLY';
-  planModel?: {
-    id: string;
-    name: string;
-    features: string[];
-    priceMonthly: number;
-    priceYearly: number;
-    isPopular?: boolean;
-  };
-  // Для обратной совместимости
   plan?: {
     id: string;
     name: string;
     features: string[];
     priceMonthly: number;
     priceYearly: number;
-    isPopular?: boolean;
   };
 }
 
@@ -110,49 +99,19 @@ class StripeService {
 
       if (!response.ok) {
         if (response.status === 404) {
-          console.log('No subscription found (404)');
+          console.log('No subscription found');
           return null;
         }
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error('Failed to fetch subscription');
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch subscription');
       }
 
-      // Сначала получаем текст ответа
-      const text = await response.text();
-      console.log('Raw response:', text);
-
-      // Проверяем на пустоту
-      if (!text || text === 'null' || text === '{}') {
-        console.log('Empty response, no subscription found');
-        return null;
-      }
-
-      // Парсим JSON
-      let subscription;
-      try {
-        subscription = JSON.parse(text);
-      } catch (parseError) {
-        console.error('Failed to parse subscription response:', parseError);
-        return null;
-      }
-
-      // Проверяем что объект не пустой
-      if (!subscription || Object.keys(subscription).length === 0) {
-        console.log('Empty subscription object');
-        return null;
-      }
-
-      // Нормализуем данные - добавляем поле plan для обратной совместимости
-      if (subscription.planModel && !subscription.plan) {
-        subscription.plan = subscription.planModel;
-      }
-
+      const subscription = await response.json();
       console.log('Subscription fetched:', subscription);
       return subscription;
     } catch (error) {
       console.error('Error in getCurrentSubscription:', error);
-      return null; // Возвращаем null вместо выброса ошибки
+      throw error;
     }
   }
 
