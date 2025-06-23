@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const { user, logout, loading: authLoading } = useAuth();
   const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -43,14 +44,22 @@ export default function DashboardPage() {
 
   const loadDashboardData = async () => {
     try {
+      setError(null);
       const accessToken = authService.getAccessToken();
-      if (!accessToken) return;
+      if (!accessToken) {
+        console.error('No access token available');
+        setLoading(false);
+        return;
+      }
 
       // Загружаем информацию о подписке
       const sub = await stripeService.getCurrentSubscription(accessToken);
+      console.log('Loaded subscription:', sub);
+      
       setSubscription(sub);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      setError('Failed to load subscription data');
     } finally {
       setLoading(false);
     }
@@ -59,7 +68,10 @@ export default function DashboardPage() {
   const handleManageSubscription = async () => {
     try {
       const accessToken = authService.getAccessToken();
-      if (!accessToken) return;
+      if (!accessToken) {
+        console.error('No access token for portal');
+        return;
+      }
 
       const portal = await stripeService.createCustomerPortal(accessToken);
       if (portal.url) {
@@ -67,6 +79,7 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Failed to open billing portal:', error);
+      setError('Failed to open billing portal');
     }
   };
 
@@ -94,7 +107,7 @@ export default function DashboardPage() {
     );
   }
 
-  // Получаем план из подписки
+  // Получаем план из подписки - проверяем оба варианта для совместимости
   const plan = subscription?.planModel || subscription?.plan;
   const hasActiveSubscription = subscription && subscription.status === 'ACTIVE' && plan;
 
@@ -122,6 +135,13 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* User Info Card */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -195,7 +215,7 @@ export default function DashboardPage() {
                     <dt className="text-sm text-gray-500">Status</dt>
                     <dd className="flex items-center text-sm">
                       <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
-                      <span className="text-green-600">Active</span>
+                      <span className="text-green-600 capitalize">{subscription.status.toLowerCase()}</span>
                     </dd>
                   </div>
                   {(subscription.stripeCurrentPeriodEnd || subscription.currentPeriodEnd) && (
@@ -216,7 +236,9 @@ export default function DashboardPage() {
               </>
             ) : (
               <div className="text-center py-4">
-                <p className="text-sm text-gray-500 mb-4">No active subscription</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  {subscription === null ? 'Loading...' : 'No active subscription'}
+                </p>
                 <button
                   onClick={() => router.push('/pricing')}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
@@ -233,7 +255,7 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900">Plan Features</h2>
               <Zap className="h-5 w-5 text-gray-400" />
             </div>
-            {hasActiveSubscription && plan.features ? (
+            {hasActiveSubscription && plan?.features ? (
               <ul className="space-y-2">
                 {plan.features.map((feature: string, index: number) => (
                   <li key={index} className="flex items-start">
