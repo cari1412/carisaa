@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, X, ChevronDown, User, LogOut, Settings, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/app/providers/auth-provider";
 
 const navigation = [
   { name: "Features", href: "/features" },
@@ -14,6 +16,35 @@ const navigation = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Закрытие меню при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [userMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUserMenuOpen(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -47,18 +78,77 @@ export default function Header() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4">
-          <Link
-            href="/login"
-            className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-          >
-            Get started
-          </Link>
+          {!loading && (
+            <>
+              {user ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                      {user.name ? user.name[0].toUpperCase() : 'U'}
+                    </div>
+                    <span>{user.name || user.email}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/settings"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Settings className="h-4 w-4" />
+                        Settings
+                      </Link>
+                      <Link
+                        href="/billing"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        Billing
+                      </Link>
+                      <hr className="my-1" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                  >
+                    Get started
+                  </Link>
+                </>
+              )}
+            </>
+          )}
         </div>
       </nav>
       
@@ -96,18 +186,67 @@ export default function Header() {
                 ))}
               </div>
               <div className="py-6">
-                <Link
-                  href="/login"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Get started
-                </Link>
+                {!loading && (
+                  <>
+                    {user ? (
+                      <>
+                        <div className="flex items-center gap-2 px-3 py-2 text-base font-semibold leading-7 text-gray-900">
+                          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                            {user.name ? user.name[0].toUpperCase() : 'U'}
+                          </div>
+                          <span>{user.name || user.email}</span>
+                        </div>
+                        <Link
+                          href="/dashboard"
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                        <Link
+                          href="/billing"
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Billing
+                        </Link>
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 w-full text-left"
+                        >
+                          Log out
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/login"
+                          className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Log in
+                        </Link>
+                        <Link
+                          href="/signup"
+                          className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Get started
+                        </Link>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
