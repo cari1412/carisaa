@@ -106,12 +106,27 @@ class StripeService {
         throw new Error(error.message || 'Failed to fetch subscription');
       }
 
-      const subscription = await response.json();
+      // Проверяем, что ответ не пустой
+      const text = await response.text();
+      if (!text) {
+        console.log('Empty response from server');
+        return null;
+      }
+
+      const subscription = JSON.parse(text);
+      
+      // Если сервер вернул null или пустой объект без id
+      if (!subscription || !subscription.id) {
+        console.log('No subscription data');
+        return null;
+      }
+
       console.log('Subscription fetched:', subscription);
       return subscription;
     } catch (error) {
       console.error('Error in getCurrentSubscription:', error);
-      throw error;
+      // Возвращаем null вместо выброса ошибки для более мягкой обработки
+      return null;
     }
   }
 
