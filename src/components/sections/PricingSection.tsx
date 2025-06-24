@@ -8,12 +8,14 @@ import { cn } from "@/lib/utils";
 import { plansService } from "@/lib/plans-service";
 import { usePlanStore } from "@/lib/store/plan-store";
 import { useAuth } from "@/app/providers/auth-provider";
+import { redirectToStripeCheckout } from "@/lib/stripe-checkout-helper";
 import type { Plan } from "@/lib/store/plan-store";
 
 export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
   const router = useRouter();
   const { user } = useAuth();
   
@@ -103,19 +105,35 @@ export default function PricingSection() {
     }
   };
 
-  const handleSelectPlan = (plan: Plan) => {
-    // Сохраняем выбранный план в Zustand store
-    setSelectedPlan({
-      planId: plan.id,
-      billingCycle: isYearly ? 'YEARLY' : 'MONTHLY',
-      plan: plan, // Сохраняем полный объект плана
-    });
-
-    // Если пользователь уже авторизован, направляем на страницу оплаты
+  const handleSelectPlan = async (plan: Plan) => {
+    // Если пользователь уже авторизован и верифицирован, сразу создаем Stripe сессию
     if (user && user.emailVerified) {
-      router.push('/checkout');
+      try {
+        setProcessingPlanId(plan.id);
+        setError("");
+        
+        await redirectToStripeCheckout({
+          planId: plan.id,
+          billingCycle: isYearly ? 'YEARLY' : 'MONTHLY',
+          onError: (error) => {
+            setError(error.message);
+            setProcessingPlanId(null);
+          }
+        });
+      } catch (err) {
+        console.error('Checkout failed:', err);
+        setError('Failed to start checkout process. Please try again.');
+        setProcessingPlanId(null);
+      }
     } else {
-      // Иначе направляем на регистрацию
+      // Сохраняем выбранный план в Zustand store для использования после регистрации
+      setSelectedPlan({
+        planId: plan.id,
+        billingCycle: isYearly ? 'YEARLY' : 'MONTHLY',
+        plan: plan,
+      });
+      
+      // Направляем на регистрацию
       router.push('/signup');
     }
   };
@@ -225,14 +243,22 @@ export default function PricingSection() {
               </p>
               <button
                 onClick={() => handleSelectPlan(plan)}
+                disabled={processingPlanId === plan.id}
                 className={cn(
-                  "mt-8 block w-full rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors",
+                  "mt-8 block w-full rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
                   plan.isPopular
                     ? "bg-blue-600 text-white hover:bg-blue-500 focus-visible:outline-blue-600"
                     : "bg-blue-50 text-blue-600 hover:bg-blue-100"
                 )}
               >
-                {user && user.emailVerified ? 'Subscribe now' : 'Start free trial'}
+                {processingPlanId === plan.id ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                    Processing...
+                  </span>
+                ) : (
+                  user && user.emailVerified ? 'Subscribe now' : 'Start free trial'
+                )}
               </button>
               <ul
                 role="list"

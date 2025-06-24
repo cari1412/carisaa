@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import { usePlanStore } from '@/lib/store/plan-store';
 import { authService } from '@/lib/auth-service';
+import { redirectToStripeCheckout } from '@/lib/stripe-checkout-helper';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.prospecttrade.org/api';
 
@@ -20,11 +21,12 @@ function VerifyEmailContent() {
   const [success, setSuccess] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [redirecting, setRedirecting] = useState(false);
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Получаем выбранный план из store
-  const selectedPlan = usePlanStore((state) => state.selectedPlan);
+  const { selectedPlan, clearSelectedPlan } = usePlanStore();
 
   useEffect(() => {
     if (!email) {
@@ -73,6 +75,37 @@ function VerifyEmailContent() {
     }
   };
 
+  const handlePostVerification = async () => {
+    try {
+      setRedirecting(true);
+      
+      // Если есть выбранный план, создаем Stripe сессию
+      if (selectedPlan) {
+        await redirectToStripeCheckout({
+          planId: selectedPlan.planId,
+          billingCycle: selectedPlan.billingCycle,
+          onError: (error) => {
+            console.error('Failed to redirect to checkout:', error);
+            setError('Failed to start payment process. Redirecting to dashboard...');
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 2000);
+          }
+        });
+        
+        // Очищаем выбранный план после успешного редиректа
+        clearSelectedPlan();
+      } else {
+        // Если плана нет, просто переходим в дашборд
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      console.error('Post-verification error:', err);
+      // В случае ошибки все равно переходим в дашборд
+      window.location.href = '/dashboard';
+    }
+  };
+
   const handleVerify = async () => {
     const verificationCode = code.join('');
     if (verificationCode.length !== 6) {
@@ -111,14 +144,10 @@ function VerifyEmailContent() {
 
       setSuccess(true);
       
+      // Запускаем процесс перенаправления
       setTimeout(() => {
-        // Обновляем страницу чтобы AuthContext подхватил новые токены
-        if (selectedPlan) {
-          window.location.href = '/checkout';
-        } else {
-          window.location.href = '/dashboard';
-        }
-      }, 2000);
+        handlePostVerification();
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
@@ -169,9 +198,16 @@ function VerifyEmailContent() {
               Email Verified!
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              {selectedPlan 
-                ? 'Redirecting to complete your subscription...' 
-                : 'Redirecting to dashboard...'}
+              {redirecting ? (
+                <>
+                  {selectedPlan 
+                    ? 'Redirecting to complete your subscription...' 
+                    : 'Redirecting to dashboard...'}
+                  <Loader2 className="inline-block ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Preparing your account...'
+              )}
             </p>
           </div>
         </div>
@@ -195,6 +231,11 @@ function VerifyEmailContent() {
           <p className="text-center text-sm font-medium text-gray-900">
             {email}
           </p>
+          {selectedPlan && (
+            <p className="mt-2 text-center text-sm text-indigo-600">
+              After verification, you'll be redirected to complete your {selectedPlan.plan?.name} subscription
+            </p>
+          )}
         </div>
         
         <div className="mt-8 space-y-6">

@@ -17,12 +17,19 @@ import {
 import { useAuth } from '@/app/providers/auth-provider';
 import { stripeService } from '@/lib/stripe-service';
 import { authService } from '@/lib/auth-service';
+import { redirectToStripeCheckout } from '@/lib/stripe-checkout-helper';
+import { usePlanStore } from '@/lib/store/plan-store';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout, loading: authLoading } = useAuth();
   const [subscription, setSubscription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+  
+  // Получаем планы из store
+  const { plans } = usePlanStore();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -69,6 +76,26 @@ export default function DashboardPage() {
     }
   };
 
+  const handleSelectPlan = async (planId: string, billingCycle: 'MONTHLY' | 'YEARLY' = 'MONTHLY') => {
+    try {
+      setCheckoutLoading(true);
+      setCheckoutError('');
+      
+      await redirectToStripeCheckout({
+        planId,
+        billingCycle,
+        onError: (error) => {
+          setCheckoutError(error.message);
+          setCheckoutLoading(false);
+        }
+      });
+    } catch (error) {
+      console.error('Checkout failed:', error);
+      setCheckoutError('Failed to start checkout process. Please try again.');
+      setCheckoutLoading(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -101,6 +128,17 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {checkoutError && (
+          <div className="mb-4 rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <AlertCircle className="h-5 w-5 text-red-400" />
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">{checkoutError}</h3>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* User Info Card */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -221,6 +259,39 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Quick Plans Section - показываем только если нет подписки */}
+        {!subscription && plans.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Subscribe</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {plans.map((plan) => (
+                <div key={plan.id} className="bg-white rounded-lg shadow p-6">
+                  <h3 className="text-lg font-semibold text-gray-900">{plan.name}</h3>
+                  <p className="text-gray-600 text-sm mt-1">{plan.description}</p>
+                  <div className="mt-4">
+                    <span className="text-2xl font-bold text-gray-900">${plan.priceMonthly}</span>
+                    <span className="text-gray-500">/month</span>
+                  </div>
+                  <button
+                    onClick={() => handleSelectPlan(plan.id, 'MONTHLY')}
+                    disabled={checkoutLoading}
+                    className="mt-4 w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {checkoutLoading ? (
+                      <span className="flex items-center justify-center">
+                        <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                        Processing...
+                      </span>
+                    ) : (
+                      'Subscribe Now'
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Activity Section */}
         <div className="mt-8">
