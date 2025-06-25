@@ -119,7 +119,7 @@ export default function DashboardNavbar() {
             </button>
 
             {/* User Menu */}
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative hidden md:block" ref={dropdownRef}>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className={cn(
