@@ -17,9 +17,11 @@ const navigation = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
   const { user, logout, loading } = useAuth();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Закрытие меню при клике вне его
   useEffect(() => {
@@ -27,20 +29,25 @@ export default function Header() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
       }
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target as Node)) {
+        setMobileUserMenuOpen(false);
+      }
     };
 
-    if (userMenuOpen) {
+    if (userMenuOpen || mobileUserMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [userMenuOpen]);
+  }, [userMenuOpen, mobileUserMenuOpen]);
 
   const handleLogout = async () => {
     try {
       await logout();
       setUserMenuOpen(false);
+      setMobileUserMenuOpen(false);
+      setMobileMenuOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -189,44 +196,64 @@ export default function Header() {
                 {!loading && (
                   <>
                     {user ? (
-                      <>
-                        <div className="flex items-center gap-2 px-3 py-2 text-base font-semibold leading-7 text-gray-900">
+                      <div className="relative" ref={mobileDropdownRef}>
+                        <button
+                          onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                          className="flex items-center gap-2 px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 w-full rounded-lg"
+                        >
                           <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
                             {user.name ? user.name[0].toUpperCase() : 'U'}
                           </div>
-                          <span>{user.name || user.email}</span>
-                        </div>
-                        <Link
-                          href="/dashboard"
-                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                        <Link
-                          href="/settings"
-                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Settings
-                        </Link>
-                        <Link
-                          href="/billing"
-                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Billing
-                        </Link>
-                        <button
-                          onClick={() => {
-                            handleLogout();
-                            setMobileMenuOpen(false);
-                          }}
-                          className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 w-full text-left"
-                        >
-                          Log out
+                          <span className="flex-1 text-left">{user.name || user.email}</span>
+                          <ChevronDown className={cn("h-4 w-4 transition-transform", mobileUserMenuOpen && "rotate-180")} />
                         </button>
-                      </>
+                        
+                        {mobileUserMenuOpen && (
+                          <div className="mt-2 space-y-1">
+                            <Link
+                              href="/dashboard"
+                              className="flex items-center gap-2 -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                              onClick={() => {
+                                setMobileUserMenuOpen(false);
+                                setMobileMenuOpen(false);
+                              }}
+                            >
+                              <User className="h-4 w-4" />
+                              Dashboard
+                            </Link>
+                            <Link
+                              href="/settings"
+                              className="flex items-center gap-2 -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                              onClick={() => {
+                                setMobileUserMenuOpen(false);
+                                setMobileMenuOpen(false);
+                              }}
+                            >
+                              <Settings className="h-4 w-4" />
+                              Settings
+                            </Link>
+                            <Link
+                              href="/billing"
+                              className="flex items-center gap-2 -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                              onClick={() => {
+                                setMobileUserMenuOpen(false);
+                                setMobileMenuOpen(false);
+                              }}
+                            >
+                              <CreditCard className="h-4 w-4" />
+                              Billing
+                            </Link>
+                            <hr className="my-2" />
+                            <button
+                              onClick={handleLogout}
+                              className="flex items-center gap-2 -mx-3 rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 w-full text-left"
+                            >
+                              <LogOut className="h-4 w-4" />
+                              Log out
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     ) : (
                       <>
                         <Link
