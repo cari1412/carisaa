@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "./providers/auth-provider";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,8 @@ export const metadata: Metadata = {
     description: "Transform your business with our cutting-edge SaaS platform.",
     url: "http://localhost:3000",
     siteName: "SaaS Platform",
+    locale: "en_US",
+    type: "website",
     images: [
       {
         url: "/og-image.png",
@@ -39,8 +42,6 @@ export const metadata: Metadata = {
         alt: "SaaS Platform Preview",
       },
     ],
-    locale: "en_US",
-    type: "website",
   },
   twitter: {
     card: "summary_large_image",
@@ -85,7 +86,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="dark scroll-smooth">
       <head>
         <script
           type="application/ld+json"
@@ -93,13 +94,15 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <Providers>
+          <AuthProvider>
+            <Header />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );
