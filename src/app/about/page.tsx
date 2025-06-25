@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Users, Target, Award, Globe } from "lucide-react";
-import StatsSection from "@/components/sections/StatsSection";
+
 import CTASection from "@/components/sections/CTASection";
 
 export const metadata: Metadata = {
@@ -77,7 +77,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <StatsSection />
+      
       <CTASection />
     </>
   );
