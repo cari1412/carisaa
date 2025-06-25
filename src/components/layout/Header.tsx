@@ -6,17 +6,9 @@ import { useRouter } from "next/navigation";
 import { Menu, X, ChevronDown, User, LogOut, Settings, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/app/providers/auth-provider";
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
-  Link as HeroUILink,
-  Button,
-} from "@heroui/react";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem } from "@heroui/navbar";
+import { Link as HeroUILink } from "@heroui/link";
+import { Button } from "@heroui/button";
 
 const navigation = [
   { name: "Features", href: "/features" },

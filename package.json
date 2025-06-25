@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroui/button": "^2.2.22",
+    "@heroui/link": "^2.2.19",
+    "@heroui/navbar": "^2.2.20",
     "@heroui/react": "^2.7.11",
     "@radix-ui/react-slot": "^1.2.3",
     "@stripe/stripe-js": "^7.3.1",
