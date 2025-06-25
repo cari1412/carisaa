@@ -162,10 +162,10 @@ export default function Header() {
 
                   {/* Mobile версия (меньше 672px) - только кнопка Sign Up */}
                   <Link
-                    href="/login"
+                    href="/signup"
                     className="min-[672px]:hidden rounded-full border border-gray-900 px-5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
                   >
-                    Login
+                    Sign Up
                   </Link>
                 </>
               )}
@@ -175,47 +175,56 @@ export default function Header() {
       </nav>
       
       {/* Mobile menu - только для неавторизованных пользователей */}
-      {!user && (
-        <div className={cn("min-[672px]:hidden", mobileMenuOpen ? "block" : "hidden")}>
-          <div className="fixed inset-0 z-50" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 left-0 z-50 w-full max-w-xs overflow-y-auto bg-white px-6 py-6 shadow-xl">
-            <div className="flex items-center justify-between mb-8">
-              <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  SaaS Platform
-                </span>
-              </Link>
-              <button
-                type="button"
-                className="-m-2.5 rounded-md p-2.5 text-gray-700"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <X className="h-6 w-6" aria-hidden="true" />
-              </button>
-            </div>
-            
-            <div className="space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+      {!user && mobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] min-[672px]:hidden">
+          {/* Backdrop */}
+          <div className="fixed inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
+          
+          {/* Menu panel */}
+          <div className="fixed inset-y-0 left-0 w-full max-w-xs bg-white shadow-xl">
+            <div className="flex h-full flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-6">
+                <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    SaaS Platform
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  className="-m-2.5 rounded-md p-2.5 text-gray-700"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {item.name}
+                  <span className="sr-only">Close menu</span>
+                  <X className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              
+              {/* Navigation */}
+              <div className="flex-1 overflow-y-auto px-6">
+                <nav className="space-y-1">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </nav>
+                
+                <hr className="my-6" />
+                
+                <Link
+                  href="/login"
+                  className="block rounded-lg px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Log in
                 </Link>
-              ))}
-              
-              <hr className="my-4" />
-              
-              <Link
-                href="/login"
-                className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Log in
-              </Link>
+              </div>
             </div>
           </div>
         </div>
