@@ -13,6 +13,11 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Avatar,
 } from "@heroui/react";
 
 const navigation = [
@@ -36,17 +41,11 @@ export default function Header() {
     }
   };
 
-  // Меню для мобильных устройств
-  const menuItems = user 
-    ? [
-        { name: "Dashboard", href: "/dashboard" },
-        { name: "Settings", href: "/settings" },
-        { name: "Billing", href: "/billing" },
-      ]
-    : [
-        ...navigation,
-        { name: "Log in", href: "/login" },
-      ];
+  // Меню для мобильных устройств (только для неавторизованных)
+  const menuItems = [
+    ...navigation,
+    { name: "Log in", href: "/login" },
+  ];
 
   return (
     <Navbar 
@@ -56,12 +55,14 @@ export default function Header() {
       maxWidth="xl"
       position="sticky"
     >
-      {/* Mobile menu toggle - показывается только на мобильных */}
-      <NavbarContent className="sm:hidden" justify="start">
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-        />
-      </NavbarContent>
+      {/* Mobile menu toggle - показывается только для неавторизованных на мобильных */}
+      {!user && (
+        <NavbarContent className="sm:hidden" justify="start">
+          <NavbarMenuToggle
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          />
+        </NavbarContent>
+      )}
 
       {/* Brand - всегда видим */}
       <NavbarBrand>
@@ -72,7 +73,7 @@ export default function Header() {
         </Link>
       </NavbarBrand>
 
-      {/* Desktop navigation - скрыт на мобильных */}
+      {/* Desktop navigation - только для неавторизованных */}
       {!user && (
         <NavbarContent className="hidden sm:flex gap-6" justify="center">
           {navigation.map((item) => (
@@ -88,37 +89,62 @@ export default function Header() {
         </NavbarContent>
       )}
 
-      {/* Desktop auth section */}
+      {/* Auth section */}
       <NavbarContent justify="end">
         {!loading && (
           <>
             {user ? (
-              <>
-                {/* Desktop user menu */}
-                <NavbarItem className="hidden sm:flex gap-4">
-                  <Link 
-                    href="/dashboard"
-                    className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                  <Button
-                    color="danger"
-                    variant="light"
+              // Авторизованный пользователь - Avatar с Dropdown
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="primary"
+                    name={user.name || user.email}
                     size="sm"
+                    fallback={
+                      <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white font-medium">
+                        {user.name ? user.name[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : 'U'}
+                      </div>
+                    }
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2">
+                    <p className="font-semibold">Signed in as</p>
+                    <p className="font-semibold">{user.email}</p>
+                  </DropdownItem>
+                  <DropdownItem key="dashboard" href="/dashboard">
+                    Dashboard
+                  </DropdownItem>
+                  <DropdownItem key="settings" href="/settings">
+                    My Settings
+                  </DropdownItem>
+                  <DropdownItem key="billing" href="/billing">
+                    Billing
+                  </DropdownItem>
+                  <DropdownItem key="team_settings">
+                    Team Settings
+                  </DropdownItem>
+                  <DropdownItem key="analytics">
+                    Analytics
+                  </DropdownItem>
+                  <DropdownItem key="help_and_feedback">
+                    Help & Feedback
+                  </DropdownItem>
+                  <DropdownItem 
+                    key="logout" 
+                    color="danger"
                     onPress={handleLogout}
                   >
-                    Log out
-                  </Button>
-                </NavbarItem>
-                {/* Mobile user info */}
-                <NavbarItem className="sm:hidden">
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">
-                    {user.name ? user.name[0].toUpperCase() : 'U'}
-                  </div>
-                </NavbarItem>
-              </>
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             ) : (
+              // Неавторизованный пользователь
               <>
                 <NavbarItem className="hidden sm:flex">
                   <Link 
@@ -157,32 +183,22 @@ export default function Header() {
         )}
       </NavbarContent>
 
-      {/* Mobile menu */}
-      <NavbarMenu className="pt-6">
-        {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item.name}-${index}`}>
-            <Link
-              className="w-full block py-2 text-base font-semibold text-gray-900"
-              href={item.href}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {item.name}
-            </Link>
-          </NavbarMenuItem>
-        ))}
-        {user && (
-          <NavbarMenuItem className="mt-4 pt-4 border-t">
-            <Button
-              className="w-full"
-              color="danger"
-              variant="light"
-              onPress={handleLogout}
-            >
-              Log out
-            </Button>
-          </NavbarMenuItem>
-        )}
-      </NavbarMenu>
+      {/* Mobile menu - только для неавторизованных */}
+      {!user && (
+        <NavbarMenu className="pt-6">
+          {menuItems.map((item, index) => (
+            <NavbarMenuItem key={`${item.name}-${index}`}>
+              <Link
+                className="w-full block py-2 text-base font-semibold text-gray-900"
+                href={item.href}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            </NavbarMenuItem>
+          ))}
+        </NavbarMenu>
+      )}
     </Navbar>
   );
 }
