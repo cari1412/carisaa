@@ -130,6 +130,8 @@ export default function Header() {
       isMenuOpen={isMenuOpen}
       className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60"
       maxWidth="xl"
+      height="4rem"
+      position="sticky"
     >
       {/* Mobile menu toggle - только для маленьких экранов */}
       <NavbarContent className="min-[672px]:hidden">
@@ -146,13 +148,15 @@ export default function Header() {
       </NavbarContent>
 
       {/* Desktop brand - только для больших экранов */}
-      <NavbarBrand className="hidden min-[672px]:flex">
-        <Link href="/" className="-m-1.5 p-1.5">
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-            SaaS Platform
-          </span>
-        </Link>
-      </NavbarBrand>
+      <NavbarContent className="hidden min-[672px]:flex">
+        <NavbarBrand>
+          <Link href="/" className="-m-1.5 p-1.5">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              SaaS Platform
+            </span>
+          </Link>
+        </NavbarBrand>
+      </NavbarContent>
 
       {/* Desktop navigation links */}
       <NavbarContent className="hidden min-[672px]:flex gap-4" justify="center">
@@ -193,15 +197,12 @@ export default function Header() {
       {/* Mobile Sign Up button */}
       <NavbarContent justify="end" className="min-[672px]:hidden">
         <NavbarItem>
-          <Button
-            as={Link}
+          <Link
             href="/signup"
-            variant="bordered"
-            className="rounded-full border-gray-900 text-gray-900 hover:bg-gray-100"
-            size="sm"
+            className="rounded-full border border-gray-900 px-5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
           >
             Sign Up
-          </Button>
+          </Link>
         </NavbarItem>
       </NavbarContent>
 
