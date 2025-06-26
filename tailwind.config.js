@@ -1,5 +1,5 @@
 // tailwind.config.js
-import {heroui} from "@heroui/react";
+import {heroui} from "@heroui/theme";
 
 /** @type {import('tailwindcss').Config} */
 const config = {

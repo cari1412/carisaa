@@ -13,13 +13,15 @@ import {
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-  Link as HeroUILink,
-  Button,
+} from "@heroui/navbar";
+import { Link as HeroUILink } from "@heroui/link";
+import { Button } from "@heroui/button";
+import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-} from "@heroui/react";
+} from "@heroui/dropdown";
 
 const navigation = [
   { name: "Features", href: "/features" },
