@@ -3,19 +3,23 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { 
-  Navbar, 
-  NavbarBrand, 
-  NavbarContent, 
-  NavbarItem, 
+import { ChevronDown, User, LogOut, Settings, CreditCard } from "lucide-react";
+import { useAuth } from "@/app/providers/auth-provider";
+import {
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
   NavbarMenuToggle,
   NavbarMenu,
   NavbarMenuItem,
-  Button
+  Link as HeroUILink,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
-import { ChevronDown, User, LogOut, Settings, CreditCard } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/app/providers/auth-provider";
 
 const navigation = [
   { name: "Features", href: "/features" },
@@ -57,33 +61,111 @@ export default function Header() {
     }
   };
 
-  // Для неавторизованных пользователей
-  const UnauthorizedNavbar = () => (
+  // Для авторизованных пользователей возвращаем простой header
+  if (user) {
+    return (
+      <Navbar 
+        className="bg-white/95 backdrop-blur-md border-b"
+        maxWidth="xl"
+        position="sticky"
+      >
+        <NavbarContent justify="start">
+          <NavbarBrand>
+            <Link href="/" className="-m-1.5 p-1.5">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                SaaS Platform
+              </span>
+            </Link>
+          </NavbarBrand>
+        </NavbarContent>
+
+        <NavbarContent justify="end">
+          {!loading && (
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button
+                  variant="light"
+                  className="gap-1 sm:gap-2 min-w-unit-12 h-unit-12"
+                >
+                  <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs sm:text-sm">
+                    {user.name ? user.name[0].toUpperCase() : 'U'}
+                  </div>
+                  <span className="hidden sm:inline">{user.name || user.email}</span>
+                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="User menu actions">
+                <DropdownItem
+                  key="dashboard"
+                  startContent={<User className="h-4 w-4" />}
+                  onClick={() => router.push('/dashboard')}
+                >
+                  Dashboard
+                </DropdownItem>
+                <DropdownItem
+                  key="settings"
+                  startContent={<Settings className="h-4 w-4" />}
+                  onClick={() => router.push('/settings')}
+                >
+                  Settings
+                </DropdownItem>
+                <DropdownItem
+                  key="billing"
+                  startContent={<CreditCard className="h-4 w-4" />}
+                  onClick={() => router.push('/billing')}
+                >
+                  Billing
+                </DropdownItem>
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  startContent={<LogOut className="h-4 w-4" />}
+                  onClick={handleLogout}
+                >
+                  Log out
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
+        </NavbarContent>
+      </Navbar>
+    );
+  }
+
+  // Для неавторизованных пользователей используем HeroUI Navbar
+  return (
     <Navbar 
       onMenuOpenChange={setIsMenuOpen}
-      className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60"
+      isMenuOpen={isMenuOpen}
+      className="bg-white/95 backdrop-blur-md border-b"
+      maxWidth="xl"
+      position="sticky"
     >
-      <NavbarContent>
+      {/* Mobile menu toggle - показываем только на мобильных устройствах */}
+      <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="min-[672px]:hidden"
         />
+      </NavbarContent>
+
+      {/* Brand */}
+      <NavbarContent className="pr-3 sm:pr-0" justify="start">
         <NavbarBrand>
           <Link href="/" className="-m-1.5 p-1.5">
-            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               SaaS Platform
-            </span>
+            </p>
           </Link>
         </NavbarBrand>
       </NavbarContent>
 
-      {/* Десктопные ссылки (>=672px) */}
-      <NavbarContent className="hidden min-[672px]:flex gap-4 lg:gap-x-12" justify="center">
+      {/* Desktop Navigation Links */}
+      <NavbarContent className="hidden sm:flex gap-6" justify="center">
         {navigation.map((item) => (
           <NavbarItem key={item.name}>
-            <Link
-              className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
+            <Link 
               href={item.href}
+              className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
             >
               {item.name}
             </Link>
@@ -91,42 +173,46 @@ export default function Header() {
         ))}
       </NavbarContent>
 
-      {/* Правые элементы */}
+      {/* Desktop Auth Buttons */}
       <NavbarContent justify="end">
-        <NavbarItem className="hidden min-[672px]:flex">
-          <Link
+        <NavbarItem className="hidden sm:flex">
+          <Link 
             href="/login"
-            className="text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
+            className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
           >
             Log in
           </Link>
         </NavbarItem>
-        <NavbarItem className="hidden min-[672px]:flex">
-          <Button
+        <NavbarItem>
+          <Button 
             as={Link}
-            href="/signup"
-            color="primary"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+            color="primary" 
+            href="/signup" 
+            variant="flat"
+            className="hidden sm:flex bg-blue-600 text-white font-semibold"
           >
             Get started
           </Button>
-        </NavbarItem>
-        <NavbarItem className="min-[672px]:hidden">
-          <Link
+          {/* Mobile Sign Up Button */}
+          <Button
+            as={Link}
+            color="default"
             href="/signup"
-            className="rounded-full border border-gray-900 px-5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
+            variant="bordered"
+            className="sm:hidden font-semibold"
+            size="sm"
           >
             Sign Up
-          </Link>
+          </Button>
         </NavbarItem>
       </NavbarContent>
 
-      {/* Мобильное меню (<672px) */}
-      <NavbarMenu>
-        {navigation.map((item) => (
-          <NavbarMenuItem key={item.name}>
+      {/* Mobile Menu */}
+      <NavbarMenu className="pt-6">
+        {navigation.map((item, index) => (
+          <NavbarMenuItem key={`${item.name}-${index}`}>
             <Link
-              className="w-full text-gray-900 hover:text-blue-600"
+              className="w-full block py-2 text-base font-semibold text-gray-900"
               href={item.href}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -134,9 +220,9 @@ export default function Header() {
             </Link>
           </NavbarMenuItem>
         ))}
-        <NavbarMenuItem>
+        <NavbarMenuItem className="mt-4 pt-4 border-t">
           <Link
-            className="w-full text-gray-900 hover:text-blue-600"
+            className="w-full block py-2 text-base font-semibold text-gray-900"
             href="/login"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -145,81 +231,5 @@ export default function Header() {
         </NavbarMenuItem>
       </NavbarMenu>
     </Navbar>
-  );
-
-  return (
-    <header>
-      {!loading && (
-        <>
-          {user ? (
-            // Авторизованный пользователь - текущая реализация
-            <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 sm:p-6 lg:px-8" aria-label="Global">
-              <div className="flex items-center gap-x-4">
-                <Link href="/" className="-m-1.5 p-1.5">
-                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    SaaS Platform
-                  </span>
-                </Link>
-              </div>
-
-              <div className="flex items-center">
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold leading-6 text-gray-900 hover:text-blue-600 transition-colors"
-                  >
-                    <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs sm:text-sm">
-                      {user.name ? user.name[0].toUpperCase() : 'U'}
-                    </div>
-                    <span className="hidden sm:inline">{user.name || user.email}</span>
-                    <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </button>
-                  
-                  {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-40 sm:w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <User className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Settings
-                      </Link>
-                      <Link
-                        href="/billing"
-                        className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Billing
-                      </Link>
-                      <hr className="my-1" />
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        <LogOut className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Log out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </nav>
-          ) : (
-            // Неавторизованный пользователь - HeroUI компоненты
-            <UnauthorizedNavbar />
-          )}
-        </>
-      )}
-    </header>
   );
 }

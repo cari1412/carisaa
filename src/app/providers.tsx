@@ -3,16 +3,22 @@
 
 import {HeroUIProvider} from '@heroui/react'
 import {useRouter} from 'next/navigation'
+import {ThemeProvider as NextThemesProvider} from "next-themes";
 
 export function Providers({children}: { children: React.ReactNode }) {
   const router = useRouter()
 
   return (
-    <HeroUIProvider 
-      navigate={router.push}
-      className="min-h-screen"
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem={false}
     >
-      {children}
-    </HeroUIProvider>
+      <HeroUIProvider 
+        navigate={router.push}
+      >
+        {children}
+      </HeroUIProvider>
+    </NextThemesProvider>
   )
 }

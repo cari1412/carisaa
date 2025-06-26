@@ -1,0 +1,29 @@
+/* app/heroui-overrides.css */
+/* Переопределение стилей HeroUI Navbar */
+.heroui-navbar {
+  --navbar-height: 4rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Фикс для правильного отображения dropdown */
+.heroui-dropdown-menu {
+  z-index: 50;
+}
+
+/* Стили для кнопок в navbar */
+.heroui-navbar .heroui-button {
+  font-weight: 600;
+}
+
+/* Убираем дефолтные отступы HeroUI */
+.heroui-navbar-content {
+  gap: 0;
+}
+
+/* Кастомные стили для мобильного меню */
+.heroui-navbar-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
