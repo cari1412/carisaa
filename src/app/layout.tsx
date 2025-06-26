@@ -86,7 +86,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="scroll-smooth">
       <head>
         <script
           type="application/ld+json"
@@ -96,11 +96,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <AuthProvider>
-            <Header />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <Footer />
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
           </AuthProvider>
         </Providers>
       </body>
