@@ -62,7 +62,7 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 py-24 sm:py-32 transition-colors">
+    <section className="bg-gray-50 dark:bg-gradient-to-b dark:from-gray-875 dark:to-gray-900 py-24 sm:py-32 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Testimonials</h2>
@@ -79,7 +79,7 @@ export default function TestimonialsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="rounded-2xl bg-white dark:bg-zinc-800 p-8 shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700 transition-colors"
+                className="rounded-2xl bg-white dark:bg-gray-800/50 p-8 shadow-sm ring-1 ring-gray-200 dark:ring-gray-700 transition-colors"
               >
                 <div className="flex gap-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (

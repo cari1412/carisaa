@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function HeroSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-zinc-950 dark:to-zinc-900 transition-colors">
+    <section className="relative isolate overflow-hidden bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors">
       <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
           <motion.div
@@ -52,7 +52,7 @@ export default function HeroSection() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
                     key={i}
-                    className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 ring-2 ring-white dark:ring-zinc-900"
+                    className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 ring-2 ring-white dark:ring-gray-800"
                   />
                 ))}
               </div>
@@ -78,16 +78,16 @@ export default function HeroSection() {
         >
           <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
             <div className="rounded-xl bg-gray-900/5 dark:bg-white/5 p-2 ring-1 ring-inset ring-gray-900/10 dark:ring-white/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-              <div className="h-[448px] w-[768px] rounded-md bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-950 dark:to-cyan-950 shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10"></div>
+              <div className="h-[448px] w-[768px] rounded-md bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-950/50 dark:to-cyan-950/50 shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10"></div>
             </div>
           </div>
         </motion.div>
       </div>
       
-      {/* Background decoration */}
+      {/* Background decoration - обновлен для темной темы */}
       <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
         <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#80b3ff] to-[#468ef9] opacity-20 dark:opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#80b3ff] to-[#468ef9] opacity-20 dark:from-blue-800/20 dark:to-cyan-800/20 dark:opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
           style={{
             clipPath:
               "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",

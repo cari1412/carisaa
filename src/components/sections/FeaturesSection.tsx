@@ -80,7 +80,7 @@ const additionalFeatures = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
+    <section id="features" className="py-24 sm:py-32 bg-white dark:bg-gradient-to-b dark:from-gray-800 dark:to-gray-850 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Everything you need</h2>
@@ -133,7 +133,7 @@ export default function FeaturesSection() {
                 className="relative pl-16"
               >
                 <dt className="text-base font-semibold leading-7 text-gray-900 dark:text-white">
-                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-zinc-800">
+                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700/50">
                     <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                   </div>
                   {feature.name}

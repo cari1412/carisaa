@@ -140,7 +140,7 @@ export default function PricingSection() {
 
   if (loading) {
     return (
-      <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
+      <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-gradient-to-b dark:from-gray-850 dark:to-gray-875 transition-colors">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
@@ -151,7 +151,7 @@ export default function PricingSection() {
   }
 
   return (
-    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors">
+    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-gradient-to-b dark:from-gray-850 dark:to-gray-875 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Pricing</h2>
@@ -171,7 +171,7 @@ export default function PricingSection() {
 
         {/* Billing toggle */}
         <div className="mt-16 flex justify-center">
-          <div className="grid grid-cols-2 gap-x-1 rounded-full bg-gray-200 dark:bg-zinc-800 p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-zinc-700">
+          <div className="grid grid-cols-2 gap-x-1 rounded-full bg-gray-200 dark:bg-gray-800 p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-gray-200 dark:ring-gray-700">
             <button
               onClick={() => setIsYearly(false)}
               className={cn(
@@ -213,8 +213,8 @@ export default function PricingSection() {
               className={cn(
                 "rounded-3xl p-8 xl:p-10 transition-colors",
                 plan.isPopular
-                  ? "bg-gray-900 dark:bg-blue-950 ring-2 ring-blue-600 dark:ring-blue-500"
-                  : "bg-white dark:bg-zinc-900 ring-1 ring-gray-200 dark:ring-zinc-800"
+                  ? "bg-gray-900 dark:bg-blue-950/80 ring-2 ring-blue-600 dark:ring-blue-500"
+                  : "bg-white dark:bg-gray-800/50 ring-1 ring-gray-200 dark:ring-gray-700"
               )}
             >
               <div className="flex items-center justify-between gap-x-4">
@@ -261,7 +261,7 @@ export default function PricingSection() {
                   "mt-8 block w-full rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
                   plan.isPopular
                     ? "bg-blue-600 text-white hover:bg-blue-500 focus-visible:outline-blue-600"
-                    : "bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900"
+                    : "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50"
                 )}
               >
                 {processingPlanId === plan.id ? (
