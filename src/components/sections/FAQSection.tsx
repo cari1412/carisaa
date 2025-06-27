@@ -47,7 +47,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 sm:py-32 bg-white">
+    <section id="faq" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           {/* Two column layout */}
@@ -60,8 +60,8 @@ export default function FAQSection() {
               viewport={{ once: true }}
               className="lg:sticky lg:top-8"
             >
-              <div className="text-sm border border-dashed border-gray-300 rounded-full px-4 py-1 bg-gradient-to-b from-gray-50 to-gray-100 w-fit whitespace-nowrap mb-6">
-                <span className="text-gray-900 text-[13.5px] flex items-center gap-2 [&_svg]:w-4 [&_svg]:h-4">
+              <div className="text-sm border border-dashed border-gray-300 dark:border-gray-700 rounded-full px-4 py-1 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800 w-fit whitespace-nowrap mb-6">
+                <span className="text-gray-900 dark:text-gray-100 text-[13.5px] flex items-center gap-2 [&_svg]:w-4 [&_svg]:h-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-help" aria-hidden="true">
                     <circle cx="12" cy="12" r="10"></circle>
                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -71,20 +71,20 @@ export default function FAQSection() {
                 </span>
               </div>
               
-              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight md:leading-[3.25rem] max-w-sm md:max-w-xl">
+              <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 dark:text-white mb-6 leading-tight md:leading-[3.25rem] max-w-sm md:max-w-xl">
                 Frequently<br className="hidden md:block" />
                 <span className="md:block">Asked Questions</span>
               </h2>
               
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
                 We're here to help! If you have any questions or need assistance, our support team is ready to assist you.
               </p>
 
               {/* Bottom decoration for desktop */}
               <div className="hidden lg:block mt-16">
-                <div className="w-32 h-32 rounded-2xl bg-gray-50 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-32 h-32 rounded-2xl bg-gray-50 dark:bg-zinc-900 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 shadow-sm dark:shadow-zinc-900 flex items-center justify-center">
+                    <svg className="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
@@ -107,21 +107,21 @@ export default function FAQSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.05 }}
                   viewport={{ once: true }}
-                  className="border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-colors duration-200"
+                  className="border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden hover:border-gray-300 dark:hover:border-zinc-700 transition-colors duration-200"
                 >
                   <button
                     onClick={() => toggleItem(index)}
-                    className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus-visible:border-blue-600 focus-visible:ring-2 focus-visible:ring-blue-600/50 rounded-md"
+                    className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors duration-200 focus:outline-none focus-visible:border-blue-600 dark:focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-600/50 dark:focus-visible:ring-blue-400/50 rounded-md"
                     aria-expanded={openItem === index}
                     aria-controls={`faq-answer-${index}`}
                   >
-                    <span className="text-base font-medium text-gray-900 pr-2 flex-1 text-left">
+                    <span className="text-base font-medium text-gray-900 dark:text-white pr-2 flex-1 text-left">
                       {faq.question}
                     </span>
                     <motion.div
                       animate={{ rotate: openItem === index ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
-                      className="flex-shrink-0 text-gray-400 pointer-events-none"
+                      className="flex-shrink-0 text-gray-400 dark:text-gray-500 pointer-events-none"
                     >
                       <ChevronDown className="w-4 h-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
                     </motion.div>
@@ -151,7 +151,7 @@ export default function FAQSection() {
                         className="overflow-hidden"
                       >
                         <div className="px-6 pb-5 -mt-2">
-                          <p className="text-gray-600 text-sm leading-relaxed">
+                          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                             {faq.answer}
                           </p>
                         </div>
@@ -171,9 +171,9 @@ export default function FAQSection() {
             viewport={{ once: true }}
             className="lg:hidden mt-12 flex justify-center"
           >
-            <div className="w-32 h-32 rounded-2xl bg-gray-50 flex items-center justify-center">
-              <div className="w-20 h-20 rounded-xl bg-white shadow-sm flex items-center justify-center">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-32 h-32 rounded-2xl bg-gray-50 dark:bg-zinc-900 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 shadow-sm dark:shadow-zinc-900 flex items-center justify-center">
+                <svg className="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>

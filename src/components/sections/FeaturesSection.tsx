@@ -80,14 +80,14 @@ const additionalFeatures = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-24 sm:py-32">
+    <section id="features" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-blue-600">Everything you need</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Everything you need</h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
             Powerful features for modern teams
           </p>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
             Our platform provides all the tools you need to streamline your workflow and boost productivity.
           </p>
         </div>
@@ -103,13 +103,13 @@ export default function FeaturesSection() {
                 viewport={{ once: true }}
                 className="flex flex-col"
               >
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900 dark:text-white">
                   <div className={`${feature.color} flex h-10 w-10 items-center justify-center rounded-lg`}>
                     <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                   </div>
                   {feature.name}
                 </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
                   <p className="flex-auto">{feature.description}</p>
                 </dd>
               </motion.div>
@@ -119,7 +119,7 @@ export default function FeaturesSection() {
 
         {/* Additional features grid */}
         <div className="mx-auto mt-20 max-w-7xl">
-          <h3 className="text-center text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl mb-12">
+          <h3 className="text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl mb-12">
             And so much more...
           </h3>
           <dl className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -132,13 +132,13 @@ export default function FeaturesSection() {
                 viewport={{ once: true }}
                 className="relative pl-16"
               >
-                <dt className="text-base font-semibold leading-7 text-gray-900">
-                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                    <feature.icon className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                <dt className="text-base font-semibold leading-7 text-gray-900 dark:text-white">
+                  <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-zinc-800">
+                    <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                   </div>
                   {feature.name}
                 </dt>
-                <dd className="mt-2 text-base leading-7 text-gray-600">{feature.description}</dd>
+                <dd className="mt-2 text-base leading-7 text-gray-600 dark:text-gray-300">{feature.description}</dd>
               </motion.div>
             ))}
           </dl>

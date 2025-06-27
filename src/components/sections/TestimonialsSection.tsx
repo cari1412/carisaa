@@ -62,11 +62,11 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="bg-gray-50 py-24 sm:py-32">
+    <section className="bg-gray-50 dark:bg-zinc-900 py-24 sm:py-32 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-blue-600">Testimonials</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Testimonials</h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
             Loved by teams everywhere
           </p>
         </div>
@@ -79,21 +79,21 @@ export default function TestimonialsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-200"
+                className="rounded-2xl bg-white dark:bg-zinc-800 p-8 shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700 transition-colors"
               >
                 <div className="flex gap-x-1">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-5 w-5 flex-none text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <blockquote className="mt-6 text-base leading-7 text-gray-900">
+                <blockquote className="mt-6 text-base leading-7 text-gray-900 dark:text-gray-100">
                   <p>"{testimonial.content}"</p>
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-x-4">
-                  <div className="h-10 w-10 rounded-full bg-gray-300" />
+                  <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600" />
                   <div>
-                    <div className="font-semibold text-gray-900">{testimonial.author.name}</div>
-                    <div className="text-sm leading-6 text-gray-600">{testimonial.author.role}</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{testimonial.author.name}</div>
+                    <div className="text-sm leading-6 text-gray-600 dark:text-gray-400">{testimonial.author.role}</div>
                   </div>
                 </figcaption>
               </motion.div>
