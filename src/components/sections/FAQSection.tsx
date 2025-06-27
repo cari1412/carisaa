@@ -47,7 +47,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
+    <section id="faq" className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           {/* Two column layout */}

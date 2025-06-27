@@ -151,7 +151,7 @@ export default function PricingSection() {
   }
 
   return (
-    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-zinc-950 transition-colors">
+    <section id="pricing" className="py-24 sm:py-32 bg-white dark:bg-gray-950 transition-colors">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-600 dark:text-blue-400">Pricing</h2>
