@@ -111,19 +111,19 @@ export default function FAQSection() {
                 >
                   <button
                     onClick={() => toggleItem(index)}
-                    className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-850 transition-colors duration-200 focus:outline-none focus-visible:border-blue-600 dark:focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-600/50 dark:focus-visible:ring-blue-400/50 rounded-md"
+                    className="w-full px-6 py-5 text-left flex items-start justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-850 transition-colors duration-200 focus:outline-none focus-visible:border-blue-600 dark:focus-visible:border-blue-400 focus-visible:ring-2 focus-visible:ring-blue-600/50 dark:focus-visible:ring-blue-400/50 rounded-md"
                     aria-expanded={openItem === index}
                     aria-controls={`faq-answer-${index}`}
                   >
-                    <span className="text-base font-medium text-gray-900 dark:text-white pr-2 flex-1 text-left">
+                    <span className="text-base font-medium text-gray-900 dark:text-white pr-4 flex-1 text-left">
                       {faq.question}
                     </span>
                     <motion.div
                       animate={{ rotate: openItem === index ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
-                      className="flex-shrink-0 text-gray-400 dark:text-gray-500 pointer-events-none"
+                      className="flex-shrink-0 text-gray-400 dark:text-gray-500 pointer-events-none mt-0.5"
                     >
-                      <ChevronDown className="w-4 h-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+                      <ChevronDown className="w-4 h-4 shrink-0 transition-transform duration-200" />
                     </motion.div>
                   </button>
                   

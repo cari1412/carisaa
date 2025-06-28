@@ -38,7 +38,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-white dark:bg-gray-900 transition-colors" aria-labelledby="footer-heading">
+    <footer className="bg-white dark:bg-gray-950 transition-colors" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
@@ -133,7 +133,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-16 border-t border-gray-200 dark:border-white/10 pt-8 sm:mt-20 lg:mt-24">
+        <div className="mt-16 border-t border-gray-200 dark:border-gray-800 pt-8 sm:mt-20 lg:mt-24">
           <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">
             &copy; {new Date().getFullYear()} SaaS Platform, Inc. All rights reserved.
           </p>
