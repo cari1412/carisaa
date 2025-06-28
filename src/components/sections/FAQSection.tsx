@@ -83,10 +83,7 @@ export default function FAQSection() {
               {/* Bottom decoration for desktop */}
               <div className="hidden lg:block mt-16">
                 <div className="w-32 h-32 rounded-2xl bg-gray-50 dark:bg-gray-850 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900 flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                  <div className="w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900">
                   </div>
                 </div>
               </div>
@@ -127,30 +124,26 @@ export default function FAQSection() {
                     </motion.div>
                   </button>
                   
-                  <AnimatePresence>
+                  <AnimatePresence initial={false}>
                     {openItem === index && (
                       <motion.div
                         id={`faq-answer-${index}`}
-                        initial={{ height: 0, opacity: 0 }}
+                        initial={{ height: 0 }}
                         animate={{ 
-                          height: "auto", 
-                          opacity: 1,
+                          height: "auto",
                           transition: {
-                            height: { duration: 0.3, ease: "easeInOut" },
-                            opacity: { duration: 0.2, delay: 0.1 }
+                            height: { duration: 0.3, ease: "easeInOut" }
                           }
                         }}
                         exit={{ 
-                          height: 0, 
-                          opacity: 0,
+                          height: 0,
                           transition: {
-                            height: { duration: 0.3, ease: "easeInOut" },
-                            opacity: { duration: 0.2 }
+                            height: { duration: 0.3, ease: "easeInOut" }
                           }
                         }}
                         className="overflow-hidden"
                       >
-                        <div className="px-6 pb-5 -mt-2">
+                        <div className="px-6 pb-5 pt-1">
                           <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                             {faq.answer}
                           </p>
@@ -172,10 +165,7 @@ export default function FAQSection() {
             className="lg:hidden mt-12 flex justify-center"
           >
             <div className="w-32 h-32 rounded-2xl bg-gray-50 dark:bg-gray-850 flex items-center justify-center">
-              <div className="w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900 flex items-center justify-center">
-                <svg className="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className="w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900">
               </div>
             </div>
           </motion.div>
